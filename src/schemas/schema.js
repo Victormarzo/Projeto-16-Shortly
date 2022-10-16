@@ -1,4 +1,5 @@
 import joi from 'joi';
+
 const signUpSchema = joi.object({
     name:joi.string()
         .empty()
@@ -13,6 +14,14 @@ const signUpSchema = joi.object({
         
 });
 
+const signInSchema= joi.object({
+    email:joi.string()
+        .required()
+        .email(),
+    password:joi.string()
+        .required(),
+});
 
 
-export{signUpSchema};
+
+export{signUpSchema,signInSchema};

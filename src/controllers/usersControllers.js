@@ -13,4 +13,17 @@ async function postSignUp (req,res){
     }
 };
 
-export {postSignUp};
+async function postSignIn(req,res){
+    const {id,token}=res.locals.body;
+    try {
+        await connection.query(`INSERT INTO sessions 
+        ("userId",token) 
+        VALUES ($1, $2);`,
+        [id,token]);
+        res.send({token:token}).status(200);
+    } catch (error) {
+        console.log(error)
+    }
+};
+
+export {postSignUp,postSignIn};
