@@ -14,7 +14,10 @@ export default async function authUser (req,res,next){
         if(!tokenValidation){
             res.sendStatus(401)
         }else{
-            next()   
+            let {userId}=tokenValidation;
+            res.locals.userId=userId;
+            next();
+            
         }      
     } catch (error) {
         console.log(error)
