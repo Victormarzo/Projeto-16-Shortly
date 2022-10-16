@@ -29,10 +29,33 @@ async function getUrlById (req,res){
             res.status(200).send(urlById)
         }   
     } catch (error) {
-    console.log(error)
+        console.log(error)
+    }
+};
+
+async function getUrlByShortUrl (req,res){
+    const shortUrl=req.params.shortUrl;
+    try {
+        const shortUrlValidation=(await connection.query(`
+            SELECT * 
+            FROM urls
+            WHERE "shortUrl" = $1; 
+            `,[shortUrl])).rows[0];    
+        if(!shortUrlValidation){
+            res.sendStatus(404);
+        }else{
+            let visitUptade=shortUrlValidation.visits+1
+            await connection.query(`
+            UPDATE urls
+            SET visits = $1
+            WHERE "shortUrl" = $2; 
+            `,[visitUptade,shortUrl])
+            res.redirect(shortUrlValidation.url)
+        }
+    } catch (error) {
+        console.log(error)    
     }
 };
 
 
-
-export{postShorten,getUrlById}
+export{postShorten,getUrlById,getUrlByShortUrl}
