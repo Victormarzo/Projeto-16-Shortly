@@ -35,12 +35,14 @@ async function getUrlById (req,res){
 
 async function getUrlByShortUrl (req,res){
     const shortUrl=req.params.shortUrl;
+    
     try {
         const shortUrlValidation=(await connection.query(`
             SELECT * 
             FROM urls
             WHERE "shortUrl" = $1; 
-            `,[shortUrl])).rows[0];    
+            `,[shortUrl])).rows[0];   
+             
         if(!shortUrlValidation){
             res.sendStatus(404);
         }else{
