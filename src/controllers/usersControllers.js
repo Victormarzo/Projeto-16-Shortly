@@ -28,4 +28,28 @@ async function postSignIn(req,res){
     }
 };
 
-export {postSignUp,postSignIn};
+async function getMe (req,res){
+    const id = res.locals.id;
+    try {
+        const getFirst = (await connection.query(`
+            SELECT id,"shortUrl",url,visits AS "visitCount"
+            FROM urls
+            WHERE "userId"=$1
+            
+            `,[id])).rows;
+        const getSecond = (await connection.query(`
+            SELECT u.id,u.name, COALESCE(SUM(s.visits),0) AS "visitCount"
+            FROM users u
+            LEFT JOIN urls s ON u.id=s."userId"
+            WHERE u.id=$1
+            GROUP BY u.id;
+        
+        `,[id])).rows[0];
+        const response={...getSecond,shortenedUrls:getFirst};
+        res.status(200).send(response);
+    } catch (error) {
+        console.log(error)
+    }
+}
+
+export {postSignUp,postSignIn,getMe};

@@ -9,7 +9,7 @@ async function postShorten (req,res){
             VALUES ($1, $2, $3);`,[userId,url,shortUrl]);
             res.status(201).send({shortUrl});
     } catch (error) {
-        console.log(error)
+        console.log(error);
     }
 };
 
@@ -26,10 +26,10 @@ async function getUrlById (req,res){
         }else{
             const {id,url,shortUrl}=urlValidation;
             const urlById={id,url,shortUrl};
-            res.status(200).send(urlById)
+            res.status(200).send(urlById);
         }   
     } catch (error) {
-        console.log(error)
+        console.log(error);
     }
 };
 
@@ -44,18 +44,26 @@ async function getUrlByShortUrl (req,res){
         if(!shortUrlValidation){
             res.sendStatus(404);
         }else{
-            let visitUptade=shortUrlValidation.visits+1
+            let visitsUpdate=shortUrlValidation.visits+1
             await connection.query(`
             UPDATE urls
             SET visits = $1
             WHERE "shortUrl" = $2; 
-            `,[visitUptade,shortUrl])
-            res.redirect(shortUrlValidation.url)
+            `,[visitsUpdate,shortUrl])
+            res.redirect(shortUrlValidation.url);
         }
     } catch (error) {
-        console.log(error)    
+        console.log(error);
     }
 };
 
+async function deleteById (req,res){
+    const id = res.locals.id;
+    await connection.query(`
+        DELETE
+        FROM urls
+        WHERE id = $1;`,[id]);
+    res.sendStatus(204);
+};
 
-export{postShorten,getUrlById,getUrlByShortUrl}
+export{postShorten,getUrlById,getUrlByShortUrl,deleteById}

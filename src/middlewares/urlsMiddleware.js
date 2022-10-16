@@ -1,5 +1,6 @@
 import {urlSchema} from "../schemas/schema.js"
 import { nanoid } from 'nanoid'
+import { connection } from "../database/database.js";
 
 async function urlValidation (req,res,next){
     const {url}=req.body;
@@ -15,4 +16,35 @@ async function urlValidation (req,res,next){
         next();
     }
 }
-export{urlValidation};
+async function deleteByIdValidation (req,res,next){
+    const {userId}=res.locals;
+    const id=req.params.id;
+    try {
+        const shortValidation = (await connection.query(`
+            SELECT *
+            FROM urls
+            WHERE id = $1;`,[id])).rows[0];
+        if(!shortValidation){
+            res.sendStatus(404);
+        }
+        const userValidation = (await connection.query(`
+            SELECT * 
+            FROM urls
+            WHERE id = $1
+            AND
+            "userId" = $2;`,[id,userId])).rows[0];    
+        if(!userValidation){
+            res.sendStatus(401);
+        }
+
+        res.locals.id=id;
+        next();
+        
+    } catch (error) {
+        console.log(error);
+    }
+    
+    
+};
+
+export{urlValidation,deleteByIdValidation};

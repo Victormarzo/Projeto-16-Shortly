@@ -53,4 +53,21 @@ async function postSignInValidation (req,res,next){
         console.log(error)
     }
 }
-export{postSignUpValidation,postSignInValidation}
+
+async function meValidation (req,res,next){
+    const {userId}=res.locals;
+    const userValidation = (await connection.query(`
+        SELECT * 
+        FROM users
+        WHERE id = $1;
+        `,[userId])).rows[0];
+    if(!userValidation){
+        res.sendStatus(404);
+    }
+    res.locals.id=userId;
+    next();
+
+};
+
+
+export{postSignUpValidation,postSignInValidation,meValidation}
